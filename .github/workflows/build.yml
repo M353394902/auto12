@@ -2,7 +2,10 @@ name: Build EXE (Win7 Compatible)
 
 on:
   push:
-    branches: [ main ]
+    paths:
+      - "**.py"
+      - "requirements.txt"
+      - ".github/workflows/build.yml"
   workflow_dispatch:
 
 jobs:
@@ -12,6 +15,14 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Cache pip
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
 
     - name: Set up Python 3.7
       uses: actions/setup-python@v5
@@ -25,10 +36,10 @@ jobs:
 
     - name: Build EXE
       run: |
-        pyinstaller gui_bot.py --onefile --windowed --icon=myicon.ico --name "auto bot"
+        pyinstaller gui_bot.py --onefile --windowed --icon=myicon.ico --name auto_bot
 
     - name: Upload EXE
       uses: actions/upload-artifact@v4
       with:
         name: auto-bot-exe
-        path: dist/auto bot.exe
+        path: dist/auto_bot.exe

@@ -1,0 +1,44 @@
+name: Build EXE
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build EXE
+      run: |
+        pyinstaller -F -w -i myicon.ico gui_bot.py
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: gui_bot_exe
+        path: dist/gui_bot.exe
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/heads/')
+      with:
+        tag_name: auto-build-${{ github.run_number }}
+        name: Auto Build ${{ github.run_number }}
+        files: dist/gui_bot.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

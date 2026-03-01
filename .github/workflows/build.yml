@@ -11,12 +11,12 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: "3.10"
 
     - name: Install dependencies
       run: |
@@ -25,20 +25,10 @@ jobs:
 
     - name: Build EXE
       run: |
-        pyinstaller -F -w -i myicon.ico gui_bot.py
+        pyinstaller gui_bot.py --onefile --windowed --icon=myicon.ico --name "auto bot"
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
+    - name: Upload EXE
+      uses: actions/upload-artifact@v4
       with:
-        name: gui_bot_exe
-        path: dist/gui_bot.exe
-
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/heads/')
-      with:
-        tag_name: auto-build-${{ github.run_number }}
-        name: Auto Build ${{ github.run_number }}
-        files: dist/gui_bot.exe
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        name: auto-bot-exe
+        path: dist/auto bot.exe
